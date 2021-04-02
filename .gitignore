@@ -84,5 +84,6 @@ dkms.conf
 
 # Stuff
 qemu.log
+build/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,assembler,c

@@ -39,7 +39,7 @@ void mm::FrameAllocator::init_allocator(stivale2_struct_tag_memmap *tag)
 		if (entry.length >= bitmap_size) 
 		{
 			// Place our bitmap here
-			bitmap = (uint8_t*)(entry.base + mm::PHYS_OFFSET);
+			bitmap = (uint8_t*)(entry.base + mm::MEMORY_PHYS_OFFSET);
 			stl::cstring::memset(bitmap, 0xFF, bitmap_size);
 
 			memory_map[i].length -= bitmap_size;
@@ -58,7 +58,7 @@ void mm::FrameAllocator::init_allocator(stivale2_struct_tag_memmap *tag)
 		// Loop through each page
 		for (size_t j = 0; j < entry.length; j += mm::PAGE_SIZE)
 		{
-			unset_bit(bitmap, (entry.base + j) / mm::PHYS_OFFSET);
+			unset_bit(bitmap, (entry.base + j) / mm::PAGE_SIZE);
 		}
 	}
 }
@@ -67,13 +67,13 @@ void* mm::FrameAllocator::alloc(uint64_t count)
 {
 	for (size_t i = 0; i < highest_addr / mm::PAGE_SIZE; i++)
 	{
-		bool enough = check_range(i, mm::PAGE_SIZE);
+		bool enough = check_range(i, count);
 		if (!enough)
 			continue;
 
 		for (size_t j = 0; j < count; j++)
 		{
-			set_bit(bitmap, j);
+			set_bit(bitmap, i + j);
 		}
 
 		// Return the address of the first page
@@ -83,9 +83,21 @@ void* mm::FrameAllocator::alloc(uint64_t count)
 	return 0;
 }
 
-void mm::FrameAllocator::free(uintptr_t addr, uint64_t count)
+void* mm::FrameAllocator::allocz(uint64_t count)
 {
-	// todo: fuck this
+	void *addr = alloc(count);
+	stl::cstring::memset(addr, 0, count * mm::PAGE_SIZE);
+
+	return addr;
+}
+
+void mm::FrameAllocator::free(void* addr, uint64_t count)
+{
+	size_t start = (uintptr_t)addr / mm::PAGE_SIZE;
+	for (size_t j = 0; j < count; j++)
+	{
+		unset_bit(bitmap, start + j);
+	}
 }
 
 bool mm::FrameAllocator::check_range(size_t start, size_t count)
