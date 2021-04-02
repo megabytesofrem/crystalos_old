@@ -34,10 +34,9 @@ extern "C" void kmain(struct stivale2_struct *stivale2_struct)
 	debug::write_string("Initializing GDT..");
 	sys::gdt::init_gdt();
 
-	char shit[50];
-	stl::convert::to_int(420, 10, shit, 50);
-
-	debug::write_string(shit);
+	debug::write_uint(4, debug::base_binary);
+	debug::write_string("\n");
+	debug::write_uint(255, debug::base_hex);
 
 	// Never ret from kmain
 	for (;;) {
