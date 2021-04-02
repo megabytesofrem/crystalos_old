@@ -1,0 +1,54 @@
+#pragma once 
+
+#include <cstdint>
+#include <cstddef>
+
+#include "cstring"
+#include <type_traits>
+
+/**
+ * Barebones conversion implementation
+ */
+namespace stl::convert
+{
+	/**
+	 * Convert an integer value into a char[], stored in buffer
+	 */
+	template <typename T>
+	inline void to_int(T num, int base, char buffer[], int size)
+	{
+		const char* rep = "0123456789ABCDEF";
+		bool sign = false;
+
+		int i = 0;
+		if (num < 0 && base == 10)
+			sign = true; // only support negative base 10 numbers
+
+		do {
+			if (i < size) {
+				buffer[i++] = rep[num % base];
+				num /= base;
+			}
+		} while (num != 0);
+
+		buffer[i] = '\0';
+		stl::cstring::reverse((char*)buffer, i);
+	}
+
+	template <typename T>
+	inline void to_unsigned(T num, int base, char buffer[], int size)
+	{
+		const char* rep = "0123456789ABCDEF";
+		int i = 0;
+
+		do {
+			if (i < size) {
+				buffer[i++] = rep[num % base];
+				num /= base;
+			}
+		} while (num != 0);
+
+		buffer[i] = '\0';
+		stl::cstring::reverse((char*)buffer, i);
+	}
+};

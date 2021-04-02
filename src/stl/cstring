@@ -1,0 +1,30 @@
+#pragma once
+
+#include <cstdint>
+#include <cstddef>
+
+/**
+ * Barebones string library implementation
+ */
+namespace stl::cstring
+{
+	inline size_t strlen(const char *s)
+	{
+		size_t i = 0;
+
+		while (s[i++] != 0) ;
+		return i;
+	}
+
+	inline void reverse(char* arr, size_t len)
+	{
+		char *p1 = arr;
+		char *p2 = arr + len - 1;
+
+		while (p1 < p2) {
+			char tmp = *p1;
+			*p1++ = *p2;
+			*p2-- = tmp;
+		}
+	}
+};
