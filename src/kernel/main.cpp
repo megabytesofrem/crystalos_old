@@ -3,6 +3,7 @@
 #include <stl/convert>
 
 #include "sys/gdt.hpp"
+#include "mm/frame_alloc.hpp"
 #include "debug.hpp"
 
 // Stivale 2
@@ -29,14 +30,28 @@ struct stivale2_header stivale_hdr = {
 	//.tags = (uintptr_t)&framebuffer_hdr_tag
 };
 
-extern "C" void kmain(struct stivale2_struct *stivale2_struct)
+extern "C" void kmain(struct stivale2_struct *stivale)
 {
-	debug::write_string("Initializing GDT..");
+	debug::write_string("Initializing GDT..\n");
 	sys::gdt::init_gdt();
 
-	debug::write_uint(4, debug::base_binary);
+	// Initialize page frame allocator
+	debug::write_string("Initialize our page allocator\n");
+	mm::FrameAllocator alloc;
+
+	stivale2_struct_tag_memmap *mmtag = (stivale2_struct_tag_memmap*)stivale::get_tag(stivale, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+	alloc.init_allocator(mmtag);
+
+	auto shit = alloc.alloc(1);
+	auto cum = alloc.alloc(1);
+	auto fuck = alloc.alloc(1);
+	debug::write_string("\n-----------------------------------------\n");
+	debug::write_uint((uintptr_t)shit, debug::base_hex);
 	debug::write_string("\n");
-	debug::write_uint(255, debug::base_hex);
+	debug::write_uint((uintptr_t)cum, debug::base_hex);
+	debug::write_string("\n");
+	debug::write_uint((uintptr_t)fuck, debug::base_hex);
+	debug::write_string("\n-----------------------------------------\n");
 
 	// Never ret from kmain
 	for (;;) {

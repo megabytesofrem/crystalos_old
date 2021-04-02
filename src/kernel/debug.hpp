@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <stl/cstring>
+#include <stl/convert>
 #include "sys/io.hpp"
 
 /**
