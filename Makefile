@@ -28,8 +28,8 @@ INTERNALCFLAGS  :=			\
 
 CPPFILES	:= $(shell find ./src -type f -name '*.cpp')
 ASMFILES	:= $(shell find ./src -type f -name '*.asm')
-OBJ			:= $(CPPFILES:.cpp=.o)
-QEMUFLAGS	= -hda $(IMAGE) -debugcon file:/dev/stdout -monitor stdio -d int -D qemu.log
+OBJ			:= $(CPPFILES:.cpp=.o) $(ASMFILES:.asm=.o)
+QEMUFLAGS	= -hda $(IMAGE) -debugcon file:/dev/stdout -monitor stdio -d int -no-reboot -no-shutdown
 
 .PHONY: all clean
 

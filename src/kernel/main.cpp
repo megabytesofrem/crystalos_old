@@ -3,6 +3,7 @@
 #include <stl/convert>
 
 #include "sys/gdt.hpp"
+#include "sys/idt.hpp"
 #include "mm/frame_alloc.hpp"
 #include "debug.hpp"
 
@@ -62,6 +63,18 @@ extern "C" void kmain(struct stivale2_struct *stivale)
 
 	auto *mmtag = (stivale2_struct_tag_memmap*)stivale::get_tag(stivale, STIVALE2_STRUCT_TAG_MEMMAP_ID);
 	frame_alloc.init_allocator(mmtag);
+
+	// Intialize interrupts
+	debug::write_string("Initialize out IDT");
+	sys::idt::init_idt();
+
+	// break it
+	asm volatile("movq $5, %%rdx;"
+				 "movq $0, %%rcx;"
+				 "divq %%rcx;"
+				 : 
+				 :
+				 :);
 
 	// Test the allocator
 	test_allocator();
